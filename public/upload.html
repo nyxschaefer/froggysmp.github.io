@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="css/pico.violet.min.css">
+    <title>Upload</title>
+  </head>
+  <body>
+    <main class="container">
+    <nav>
+         <ul>
+            <li><strong>Froggy SMP Clips</strong></li>
+        </ul>
+        <ul>
+            <li><a href="index.html">Watch</a></li>
+            <li><a href="upload.html">Upload</a></li>
+        </ul>
+    </nav>
+ <article>    
+<h2>Upload Your Clips</h2>
+<small> Please note, uploads will not be public immediately, they will first pass through human eyes and then be submitted.</small>
+</article> 
+<article>
+<form>
+    <h4>Enter information about your upload</h4>
+    <fieldset class="grid">
+    <input 
+    type="text"
+      name="clip_title"
+      placeholder="Clip Title"
+      aria-label="Clip Title"
+    />
+    <input
+      type="text"
+      name="editor"
+      placeholder="Editor"
+      aria-label="Editor"
+    />
+    </fieldset>
+    <h4>Submit your clip</h4>
+  <fieldset>
+    <label>
+      <input
+        type="url"
+        name="clip_url"
+        placeholder="Clip URL"
+      />
+    </label>
+    OR
+<input type="file">
+  </fieldset>
+
+  <input
+    type="submit"
+    value="Upload"
+  />
+</form>
+</article>
+
+    </main>
+  </body>
+</html>
