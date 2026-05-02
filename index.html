@@ -6,6 +6,7 @@
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="css/pico.violet.min.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/player.style/sutro/+esm"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/vimeo-video-element/+esm"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element/+esm"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -200,6 +201,22 @@
             });
         }
 
+        function isYouTubeUrl(url) {
+            return url && (
+                url.includes('youtube.com/watch?v=') ||
+                url.includes('youtu.be/') ||
+                url.includes('youtube.com/embed/') ||
+                url.includes('youtube.com/v/')
+            );
+        }
+
+        function isVimeoUrl(url) {
+            return url && (
+                url.includes('vimeo.com/') ||
+                url.includes('player.vimeo.com/video/')
+            );
+        }
+
         function renderClips(filter = '', sortKey = 'latest') {
             const container = document.getElementById('clips-container');
             const query = filter.trim().toLowerCase();
@@ -232,12 +249,28 @@
                     </div>
                     <div class="clip-card__video">
                         <media-theme-sutro style="width:100%" class="container">
-                            <video
-                                slot="media"
-                                src="${upload.clip_url}"
-                                playsinline
-                                crossorigin="anonymous"
-                            ></video>
+                            ${isYouTubeUrl(upload.clip_url) ? `
+                                <youtube-video
+                                    slot="media"
+                                    src="${upload.clip_url}"
+                                    playsinline
+                                    crossorigin="anonymous"
+                                ></youtube-video>
+                            ` : isVimeoUrl(upload.clip_url) ? `
+                                <vimeo-video
+                                    slot="media"
+                                    src="${upload.clip_url}"
+                                    playsinline
+                                    crossorigin="anonymous"
+                                ></vimeo-video>
+                            ` : `
+                                <video
+                                    slot="media"
+                                    src="${upload.clip_url}"
+                                    playsinline
+                                    crossorigin="anonymous"
+                                ></video>
+                            `}
                         </media-theme-sutro>
                     </div>
                 `;
