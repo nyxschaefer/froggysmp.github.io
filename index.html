@@ -6,6 +6,8 @@
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="css/pico.violet.min.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/player.style/sutro/+esm"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
     <title>Froggy SMP Clips</title>
   </head>
   <body>
@@ -27,50 +29,39 @@
 
 
     </main>
+    <script src="firebase-config.js"></script>
     <script>
         async function loadClips() {
             try {
-                const response = await fetch('/api/uploads');
-                const uploads = await response.json();
-                
                 const container = document.getElementById('clips-container');
                 
-                uploads.forEach(upload => {
+                // Get all documents from the uploads collection, ordered by timestamp
+                const querySnapshot = await db.collection('uploads')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                querySnapshot.forEach(doc => {
+                    const upload = doc.data();
                     const article = document.createElement('article');
                     
-                    if (upload.clip_url) {
-                        article.innerHTML = `
-                            <media-theme-sutro style="width:50%" class="container">
-                                <video
-                                    slot="media"
-                                    src="${upload.clip_url}"
-                                    playsinline
-                                    crossorigin="anonymous"
-                                ></video>
-                            </media-theme-sutro>
-                            <h3>${upload.clip_title}</h3>
-                            <p>Editor: ${upload.editor}</p>
-                        `;
-                    } else if (upload.clip_file_name) {
-                        article.innerHTML = `
-                            <media-theme-sutro style="width:50%" class="container">
-                                <video
-                                    slot="media"
-                                    src="/clips/${upload.clip_file_name}"
-                                    playsinline
-                                    crossorigin="anonymous"
-                                ></video>
-                            </media-theme-sutro>
-                            <h3>${upload.clip_title}</h3>
-                            <p>Editor: ${upload.editor}</p>
-                            <a href="/clips/${upload.clip_file_name}" download><button class="secondary">Download</button></a>
-                        `;
-                    }
+                    article.innerHTML = `
+                        <media-theme-sutro style="width:50%" class="container">
+                            <video
+                                slot="media"
+                                src="${upload.clip_url}"
+                                playsinline
+                                crossorigin="anonymous"
+                            ></video>
+                        </media-theme-sutro>
+                        <h3>${upload.clip_title}</h3>
+                        <p>Editor: ${upload.editor}</p>
+                    `;
                     
                     container.appendChild(article);
                 });
             } catch (error) {
                 console.error('Error loading clips:', error);
+                document.getElementById('clips-container').innerHTML = '<p>Error loading clips. Please refresh the page.</p>';
             }
         }
         

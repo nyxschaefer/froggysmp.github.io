@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="css/pico.violet.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
     <title>Upload</title>
   </head>
   <body>
@@ -43,18 +45,16 @@
       required
     />
     </fieldset>
-    <h4>Submit your clip</h4>
+    <h4>Clip URL</h4>
   <fieldset>
-    <label>
-      <input
-        type="url"
-        name="clip_url"
-        id="clip_url"
-        placeholder="Clip URL"
-      />
-    </label>
-    OR
-<input type="file" id="clip_file" name="clip_file">
+    <input
+      type="url"
+      name="clip_url"
+      id="clip_url"
+      placeholder="https://example.com/video.mp4"
+      aria-label="Clip URL"
+      required
+    />
   </fieldset>
 
   <input
@@ -65,6 +65,7 @@
 </article>
 
     </main>
+    <script src="firebase-config.js"></script>
     <script>
       function showModal(title, message, isSuccess = true) {
         const dialog = document.createElement('dialog');
@@ -90,23 +91,31 @@
       document.getElementById('uploadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const formData = new FormData(this);
-        
+        const clipTitle = document.getElementById('clip_title').value;
+        const editor = document.getElementById('editor').value;
+        const clipUrl = document.getElementById('clip_url').value;
+
+        if (!clipTitle || !editor || !clipUrl) {
+          showModal('Validation Error', 'Please fill in all required fields', false);
+          return;
+        }
+
         try {
-          const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-          });
+          // Save metadata to Firestore
+          const timestamp = new Date().toISOString();
+          const uploadData = {
+            clip_title: clipTitle,
+            editor: editor,
+            clip_url: clipUrl,
+            timestamp: timestamp
+          };
+
+          await db.collection('uploads').add(uploadData);
           
-          const result = await response.json();
-          
-          if (response.ok) {
-            showModal('Upload Successful!', 'Your clip has been uploaded successfully.', true);
-            this.reset();
-          } else {
-            showModal('Upload Failed', result.error, false);
-          }
+          showModal('Upload Successful!', 'Your clip has been uploaded successfully.', true);
+          this.reset();
         } catch (error) {
+          console.error('Upload error:', error);
           showModal('Upload Failed', error.message, false);
         }
       });
