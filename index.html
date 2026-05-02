@@ -20,7 +20,7 @@
         max-width: 980px;
         margin: 0 auto;
         border-radius: 24px;
-        background: rgba(255,255,255,0.05);
+        background: rgb(24,28,37);
         border: 1px solid rgba(255,255,255,0.08);
         box-shadow: 0 18px 50px rgba(0,0,0,0.28);
         overflow: hidden;
@@ -35,21 +35,31 @@
         background: transparent;
       }
       .clip-card__title {
-        margin: 0;
-        font-size: 1.35rem;
-        line-height: 1.1;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        color: #f8fafc;
-        text-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.1);
-        display: inline-block;
-        margin-right: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        overflow: hidden;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        margin: 0.15rem 0 0;
+        margin-right: 0.75rem;
       }
-      .clip-card__title-divider {
-        display: inline-block;
-        margin: 0 0.5rem;
-        color: rgba(255,255,255,0.4);
-        font-size: 1rem;
+      .clip-card__title span {
+        padding: 0.2rem 0.5rem;
+        background: rgba(147,51,234,0.15);
+        color: #c4b5fd;
+        border-right: 1px solid rgba(255,255,255,0.12);
+      }
+      .clip-card__title strong {
+        padding: 0.2rem 0.5rem;
+        font-weight: 700;
+        color: #f8fafc;
+        text-transform: none;
+        letter-spacing: normal;
+        background: rgba(255,255,255,0.05);
       }
       .clip-card__meta {
         display: inline-flex;
@@ -213,9 +223,8 @@
                 article.className = 'clip-card';
                 article.innerHTML = `
                     <div class="clip-card__header">
-                        <div>
-                            <h3 class="clip-card__title">${upload.clip_title}</h3>
-                            <span class="clip-card__title-divider">•</span>
+                        <div class="clip-card__info">
+                            <p class="clip-card__title"><span>Title</span><strong>${upload.clip_title}</strong></p>
                             <p class="clip-card__meta"><span>Editor</span><strong>${upload.editor}</strong></p>
                         </div>
                         <div class="clip-card__tag">${upload.timestamp ? new Date(upload.timestamp).toLocaleDateString() : 'No date'}</div>
