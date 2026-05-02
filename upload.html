@@ -23,7 +23,7 @@
 <small> Please note, uploads will not be public immediately, they will first pass through human eyes and then be submitted.</small>
 </article> 
 <article>
-<form id="uploadForm">
+<form id="uploadForm" enctype="multipart/form-data">
     <h4>Enter information about your upload</h4>
     <fieldset class="grid">
     <input 
@@ -54,55 +54,62 @@
       />
     </label>
     OR
-<input type="file" id="clip_file">
+<input type="file" id="clip_file" name="clip_file">
   </fieldset>
 
   <input
     type="submit"
     value="Upload"
-    onclick="upload()"
   />
 </form>
 </article>
 
-<script>
-document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  
-  const clipTitle = document.getElementById('clip_title').value;
-  const editor = document.getElementById('editor').value;
-  const clipUrl = document.getElementById('clip_url').value;
-  const clipFile = document.getElementById('clip_file').files[0];
-  
-  const formData = {
-    clip_title: clipTitle,
-    editor: editor,
-    clip_url: clipUrl,
-    clip_file: clipFile ? clipFile.name : null
-  };
-  
-  try {
-    const response = await fetch('api/upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    });
-    
-    if (response.ok) {
-      alert('Upload successful!');
-      document.getElementById('uploadForm').reset();
-    } else {
-      alert('Upload failed!');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('An error occurred during upload.');
-  }
-});
-</script>
-
     </main>
-  </body>
+    <script>
+      function showModal(title, message, isSuccess = true) {
+        const dialog = document.createElement('dialog');
+        dialog.open = true;
+        dialog.innerHTML = `
+          <article>
+            <header>
+              <button aria-label="Close" rel="prev" onclick="this.closest('dialog').close()"></button>
+              <p>
+                <strong>${isSuccess ? '✅' : '❌'} ${title}</strong>
+              </p>
+            </header>
+            <p>${message}</p>
+          </article>
+        `;
+        document.body.appendChild(dialog);
+        
+        dialog.addEventListener('close', () => {
+          dialog.remove();
+        });
+      }
+
+      document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        try {
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok) {
+            showModal('Upload Successful!', 'Your clip has been uploaded successfully.', true);
+            this.reset();
+          } else {
+            showModal('Upload Failed', result.error, false);
+          }
+        } catch (error) {
+          showModal('Upload Failed', error.message, false);
+        }
+      });
+    </script>
+  </body> 
 </html>
