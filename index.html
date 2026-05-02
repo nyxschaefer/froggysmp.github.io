@@ -101,19 +101,18 @@
 
     <h3>Clips</h3>
 
-<fieldset role="group">
+<form role="search">
     
-    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem;">
+    
       <input
         type="search"
         id="clip-search"
         name="search"
         placeholder="Search clips by title or editor"
         aria-label="Search clips"
-        style="flex: 1 1 320px; min-width: 220px;"
+
       />
 
-      <label>
         <select id="clip-sort">
           <option value="latest">Latest first</option>
           <option value="oldest">Oldest first</option>
@@ -122,9 +121,8 @@
           <option value="editor-asc">Editor A → Z</option>
           <option value="editor-desc">Editor Z → A</option>
         </select>
-    </label>
 
-</fieldset>
+</form>
 
     </div>
         <div id="clips-container">
