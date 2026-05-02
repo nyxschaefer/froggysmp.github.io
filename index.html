@@ -100,13 +100,33 @@
         >
 
     <h3>Clips</h3>
-    <input
-      type="search"
-      id="clip-search"
-      name="search"
-      placeholder="Search clips by title or editor"
-      aria-label="Search clips"
-    />
+
+<fieldset role="group">
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem;">
+      <input
+        type="search"
+        id="clip-search"
+        name="search"
+        placeholder="Search clips by title or editor"
+        aria-label="Search clips"
+        style="flex: 1 1 320px; min-width: 220px;"
+      />
+
+      <label>
+        <select id="clip-sort">
+          <option value="latest">Latest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="title-asc">Title A → Z</option>
+          <option value="title-desc">Title Z → A</option>
+          <option value="editor-asc">Editor A → Z</option>
+          <option value="editor-desc">Editor Z → A</option>
+        </select>
+    </label>
+
+</fieldset>
+
+    </div>
         <div id="clips-container">
             <!-- Clips will be loaded here -->
         </div>
@@ -116,8 +136,36 @@
 
     <script>
         const clips = [];
+        let currentSort = 'latest';
 
-        function renderClips(filter = '') {
+        function sortClips(list, sortKey) {
+            return list.slice().sort((a, b) => {
+                const aTitle = (a.clip_title || '').toLowerCase();
+                const bTitle = (b.clip_title || '').toLowerCase();
+                const aEditor = (a.editor || '').toLowerCase();
+                const bEditor = (b.editor || '').toLowerCase();
+                const aTime = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                const bTime = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+
+                switch (sortKey) {
+                    case 'oldest':
+                        return aTime - bTime;
+                    case 'title-asc':
+                        return aTitle.localeCompare(bTitle);
+                    case 'title-desc':
+                        return bTitle.localeCompare(aTitle);
+                    case 'editor-asc':
+                        return aEditor.localeCompare(bEditor);
+                    case 'editor-desc':
+                        return bEditor.localeCompare(aEditor);
+                    case 'latest':
+                    default:
+                        return bTime - aTime;
+                }
+            });
+        }
+
+        function renderClips(filter = '', sortKey = 'latest') {
             const container = document.getElementById('clips-container');
             const query = filter.trim().toLowerCase();
             container.innerHTML = '';
@@ -129,12 +177,14 @@
                 return title.includes(query) || editor.includes(query);
             });
 
-            if (filtered.length === 0) {
+            const sorted = sortClips(filtered, sortKey);
+
+            if (sorted.length === 0) {
                 container.innerHTML = '<p>No clips match your search.</p>';
                 return;
             }
 
-            filtered.forEach(upload => {
+            sorted.forEach(upload => {
                 const article = document.createElement('article');
                 article.className = 'clip-card';
                 article.innerHTML = `
@@ -170,7 +220,7 @@
                     clips.push(doc.data());
                 });
 
-                renderClips();
+                renderClips('', currentSort);
             } catch (error) {
                 console.error('Error loading clips:', error);
                 document.getElementById('clips-container').innerHTML = '<p>Error loading clips. Please refresh the page.</p>';
@@ -179,7 +229,14 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('clip-search');
-            searchInput.addEventListener('input', () => renderClips(searchInput.value));
+            const sortSelect = document.getElementById('clip-sort');
+
+            searchInput.addEventListener('input', () => renderClips(searchInput.value, sortSelect.value));
+            sortSelect.addEventListener('change', () => {
+                currentSort = sortSelect.value;
+                renderClips(searchInput.value, currentSort);
+            });
+
             loadClips();
         });
     </script>
