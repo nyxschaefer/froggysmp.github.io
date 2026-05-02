@@ -5,22 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="css/pico.violet.min.css">
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
-    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCJkMCBWwhaCGaBCWbGFWduwqQCHEzEEHk",
+        authDomain: "froggysmp-c2ac5.firebaseapp.com",
+        projectId: "froggysmp-c2ac5",
+        storageBucket: "froggysmp-c2ac5.firebasestorage.app",
+        messagingSenderId: "589025592162",
+        appId: "1:589025592162:web:5f24dd540d4de22c2a623b",
+        measurementId: "G-28C7KF83Z4"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      window.db = firebase.firestore();
+    </script>
     <title>Upload</title>
   </head>
   <body>
     <main class="container">
     <nav>
          <ul>
-            <li><strong>Froggy SMP Clips</strong></li>
+            <li><strong>Froggy SMP</strong></li>
         </ul>
         <ul>
-            <li><a href="index.html">Watch</a></li>
-            <li><a href="upload.html">Upload</a></li>
+            <li><a href="index.html"><button>Watch</button></a></li>
+            <li style="margin-left: .5em;"><a href="upload.html"><button class="secondary">Upload</button></a></li>
         </ul>
     </nav>
+
  <article>    
 <h2>Upload Your Clips</h2>
 <small> Please note, uploads will not be public immediately, they will first pass through human eyes and then be submitted.</small>

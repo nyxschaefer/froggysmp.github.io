@@ -5,31 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="css/pico.violet.min.css">
+    <link rel="stylesheet" href="home.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/player.style/sutro/+esm"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
-    <script src="firebase-config.js"></script>
-    <title>Froggy SMP Clips</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCJkMCBWwhaCGaBCWbGFWduwqQCHEzEEHk",
+        authDomain: "froggysmp-c2ac5.firebaseapp.com",
+        projectId: "froggysmp-c2ac5",
+        storageBucket: "froggysmp-c2ac5.firebasestorage.app",
+        messagingSenderId: "589025592162",
+        appId: "1:589025592162:web:5f24dd540d4de22c2a623b",
+        measurementId: "G-28C7KF83Z4"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      window.db = firebase.firestore();
+    </script>
+    <title>Froggy SMP</title>
   </head>
   <body>
     <main class="container">
+
     <nav>
          <ul>
-            <li><strong>Froggy SMP Clips</strong></li>
+            <li><strong>Froggy SMP</strong></li>
         </ul>
         <ul>
-            <li><a href="index.html">Watch</a></li>
-            <li><a href="upload.html">Upload</a></li>
+            <li><a href="index.html"><button>Watch</button></a></li>
+            <li style="margin-left: .5em;"><a href="upload.html"><button class="secondary">Upload</button></a></li>
         </ul>
     </nav>
 
-        <article id="clips-container">
-            <!-- Clips will be loaded here -->
-        </article>
+    <article>
+        
+            <img src="/photos/sunset.png"
+            alt="sunset"
+            style="width: 100%; max-width: 600px; display: block; margin: 0 auto;"
+            />
 
+            <center><kbd style="margin-top: 1em;">111.111.111.111</kbd></center>
+
+    </article>
+
+    <h3>Clips</h3>
+        <div id="clips-container">
+            <!-- Clips will be loaded here -->
+        </div>
 
 
     </main>
+
     <script>
         async function loadClips() {
             try {
@@ -45,7 +74,9 @@
                     const article = document.createElement('article');
                     
                     article.innerHTML = `
-                        <media-theme-sutro style="width:50%" class="container">
+                    <center>
+                        <div class="container" style="margin-bottom: .5em;">
+                        <media-theme-sutro style="width:80%" class="container">
                             <video
                                 slot="media"
                                 src="${upload.clip_url}"
@@ -53,8 +84,15 @@
                                 crossorigin="anonymous"
                             ></video>
                         </media-theme-sutro>
-                        <h3>${upload.clip_title}</h3>
-                        <p>Editor: ${upload.editor}</p>
+                        </div>
+                        <div class="container" style="margin-bottom: .5em;">
+                        <kbd>${upload.clip_title}</kbd>
+                        </div>
+                        <div class="container">
+                        <kbd>Editor: ${upload.editor}</kbd>
+                        </div>
+                        </center>
+                    
                     `;
                     
                     container.appendChild(article);
@@ -67,5 +105,6 @@
         
         loadClips();
     </script>
+
   </body>
 </html>
