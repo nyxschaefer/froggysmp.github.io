@@ -23,20 +23,24 @@
 <small> Please note, uploads will not be public immediately, they will first pass through human eyes and then be submitted.</small>
 </article> 
 <article>
-<form>
+<form id="uploadForm">
     <h4>Enter information about your upload</h4>
     <fieldset class="grid">
     <input 
     type="text"
       name="clip_title"
+      id="clip_title"
       placeholder="Clip Title"
       aria-label="Clip Title"
+      required
     />
     <input
       type="text"
       name="editor"
+      id="editor"
       placeholder="Editor"
       aria-label="Editor"
+      required
     />
     </fieldset>
     <h4>Submit your clip</h4>
@@ -45,11 +49,12 @@
       <input
         type="url"
         name="clip_url"
+        id="clip_url"
         placeholder="Clip URL"
       />
     </label>
     OR
-<input type="file">
+<input type="file" id="clip_file">
   </fieldset>
 
   <input
@@ -58,6 +63,44 @@
   />
 </form>
 </article>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const clipTitle = document.getElementById('clip_title').value;
+  const editor = document.getElementById('editor').value;
+  const clipUrl = document.getElementById('clip_url').value;
+  const clipFile = document.getElementById('clip_file').files[0];
+  
+  const formData = {
+    clip_title: clipTitle,
+    editor: editor,
+    clip_url: clipUrl,
+    clip_file: clipFile ? clipFile.name : null
+  };
+  
+  try {
+    const response = await fetch('api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    if (response.ok) {
+      alert('Upload successful!');
+      document.getElementById('uploadForm').reset();
+    } else {
+      alert('Upload failed!');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred during upload.');
+  }
+});
+</script>
 
     </main>
   </body>
