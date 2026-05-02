@@ -9,22 +9,69 @@
     <script type="module" src="https://cdn.jsdelivr.net/npm/player.style/sutro/+esm"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script>
-      // Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyCJkMCBWwhaCGaBCWbGFWduwqQCHEzEEHk",
-        authDomain: "froggysmp-c2ac5.firebaseapp.com",
-        projectId: "froggysmp-c2ac5",
-        storageBucket: "froggysmp-c2ac5.firebasestorage.app",
-        messagingSenderId: "589025592162",
-        appId: "1:589025592162:web:5f24dd540d4de22c2a623b",
-        measurementId: "G-28C7KF83Z4"
-      };
-
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      window.db = firebase.firestore();
-    </script>
+    <script src="firebase-config.js"></script>
+    <style>
+      body {
+        background: #13171f;
+        color: #e2e8f0;
+      }
+      #clips-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .clip-card {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        border-radius: 24px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 18px 50px rgba(0,0,0,0.28);
+        overflow: hidden;
+      }
+      .clip-card__header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        background: transparent;
+      }
+      .clip-card__title {
+        margin: 0;
+        font-size: 1.2rem;
+        line-height: 1.2;
+        color: #f8fafc;
+      }
+      .clip-card__meta {
+        margin: 0.35rem 0 0;
+        color: #a8b8d1;
+        font-size: 0.95rem;
+      }
+      .clip-card__tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: #d8e4ff;
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+      .clip-card__video {
+        width: 100%;
+        background: transparent;
+        overflow: hidden;
+        border-radius: 24px;
+      }
+      .clip-card__video media-theme-sutro,
+      .clip-card__video video {
+        border-radius: 24px;
+        display: block;
+      }
+    </style>
     <title>Froggy SMP</title>
   </head>
   <body>
@@ -40,18 +87,26 @@
         </ul>
     </nav>
 
-    <article>
-        
             <img src="/photos/sunset.png"
             alt="sunset"
-            style="width: 100%; max-width: 600px; display: block; margin: 0 auto;"
+            style="width: 100%; display: block; margin: 0 auto;"
             />
-
-            <center><kbd style="margin-top: 1em;">111.111.111.111</kbd></center>
-
-    </article>
+        <input
+            type="text"
+            name="text"
+            value="Server IP: 111.111.111.111"
+            aria-label="Read-only input"
+            readonly
+        >
 
     <h3>Clips</h3>
+    <input
+      type="search"
+      id="clip-search"
+      name="search"
+      placeholder="Search clips by title or editor"
+      aria-label="Search clips"
+    />
         <div id="clips-container">
             <!-- Clips will be loaded here -->
         </div>
@@ -60,23 +115,38 @@
     </main>
 
     <script>
-        async function loadClips() {
-            try {
-                const container = document.getElementById('clips-container');
-                
-                // Get all documents from the uploads collection, ordered by timestamp
-                const querySnapshot = await db.collection('uploads')
-                    .orderBy('timestamp', 'desc')
-                    .get();
-                
-                querySnapshot.forEach(doc => {
-                    const upload = doc.data();
-                    const article = document.createElement('article');
-                    
-                    article.innerHTML = `
-                    <center>
-                        <div class="container" style="margin-bottom: .5em;">
-                        <media-theme-sutro style="width:80%" class="container">
+        const clips = [];
+
+        function renderClips(filter = '') {
+            const container = document.getElementById('clips-container');
+            const query = filter.trim().toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = clips.filter(upload => {
+                if (!query) return true;
+                const title = upload.clip_title?.toLowerCase() || '';
+                const editor = upload.editor?.toLowerCase() || '';
+                return title.includes(query) || editor.includes(query);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p>No clips match your search.</p>';
+                return;
+            }
+
+            filtered.forEach(upload => {
+                const article = document.createElement('article');
+                article.className = 'clip-card';
+                article.innerHTML = `
+                    <div class="clip-card__header">
+                        <div>
+                            <h3 class="clip-card__title">${upload.clip_title}</h3>
+                            <p class="clip-card__meta">Editor: <strong>${upload.editor}</strong></p>
+                        </div>
+                        <div class="clip-card__tag">${upload.timestamp ? new Date(upload.timestamp).toLocaleDateString() : 'No date'}</div>
+                    </div>
+                    <div class="clip-card__video">
+                        <media-theme-sutro style="width:100%" class="container">
                             <video
                                 slot="media"
                                 src="${upload.clip_url}"
@@ -84,26 +154,34 @@
                                 crossorigin="anonymous"
                             ></video>
                         </media-theme-sutro>
-                        </div>
-                        <div class="container" style="margin-bottom: .5em;">
-                        <kbd>${upload.clip_title}</kbd>
-                        </div>
-                        <div class="container">
-                        <kbd>Editor: ${upload.editor}</kbd>
-                        </div>
-                        </center>
-                    
-                    `;
-                    
-                    container.appendChild(article);
+                    </div>
+                `;
+                container.appendChild(article);
+            });
+        }
+
+        async function loadClips() {
+            try {
+                const querySnapshot = await db.collection('uploads')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                querySnapshot.forEach(doc => {
+                    clips.push(doc.data());
                 });
+
+                renderClips();
             } catch (error) {
                 console.error('Error loading clips:', error);
                 document.getElementById('clips-container').innerHTML = '<p>Error loading clips. Please refresh the page.</p>';
             }
         }
-        
-        loadClips();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('clip-search');
+            searchInput.addEventListener('input', () => renderClips(searchInput.value));
+            loadClips();
+        });
     </script>
 
   </body>
