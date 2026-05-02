@@ -14,14 +14,26 @@
     <link rel="icon" type="image/x-icon" href="/photos/favicon.ico">
     <style>
       #clips-container {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr;
         gap: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        #clips-container {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+        }
+      }
+
+      @media (min-width: 1200px) {
+        #clips-container {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2rem;
+        }
       }
       .clip-card {
         width: 100%;
-        max-width: 980px;
-        margin: 0 auto;
         border-radius: 24px;
         background: rgb(24,28,37);
         border: 1px solid rgba(255,255,255,0.08);
@@ -101,6 +113,7 @@
       }
       .clip-card__video {
         width: 100%;
+        aspect-ratio: 16 / 9;
         background: transparent;
         overflow: hidden;
         border-radius: 24px;
@@ -110,8 +123,7 @@
       .clip-card__video vimeo-video,
       .clip-card__video video {
         width: 100%;
-        aspect-ratio: 16 / 9;
-        min-height: 360px;
+        height: 100%;
         border-radius: 24px;
         display: block;
       }
